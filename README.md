@@ -3,6 +3,10 @@
 WebカメラとAIによる姿勢推定技術を利用して、腕立て伏せの回数をリアルタイムで自動カウントするWebアプリケーションです。  
 ジムに行かなくても、自宅で手軽に正確なトレーニング記録がつけられます。
 
+<div align="center">
+  <img src="images/push_up_screenshot.png" alt="筋トレのスクリーンショット">
+</div>
+
 ここから開始できます⇒https://imshota1009.github.io/Push-up-counter/
 
 ---
