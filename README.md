@@ -3,6 +3,8 @@
 WebカメラとAIによる姿勢推定技術を利用して、腕立て伏せの回数をリアルタイムで自動カウントするWebアプリケーションです。  
 ジムに行かなくても、自宅で手軽に正確なトレーニング記録がつけられます。
 
+ここから開始できます⇒
+
 ---
 
 <p align="center"> <img src="https://img.shields.io/badge/HTML5-8B4513?style=for-the-badge&logo=html5&logoColor=white" alt="HTML5"> <img src="https://img.shields.io/badge/CSS3-6A0DAD?style=for-the-badge&logo=css3&logoColor=white" alt="CSS3"> <img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black" alt="JavaScript"> </p>
