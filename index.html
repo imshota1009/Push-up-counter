@@ -1,26 +1,26 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI 腕立て伏せカウンター</title>
-    <!-- Tailwind CSSを読み込み -->
+    <title>AI Push-up Counter</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fontsを読み込み -->
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
-        /* カスタムスタイル */
+        /* Custom Styles */
         body {
-            font-family: 'Inter', 'Noto Sans JP', sans-serif;
-            touch-action: manipulation; /* ダブルタップによるズームを無効化 */
+            font-family: 'Inter', sans-serif;
+            touch-action: manipulation; /* Disable zoom on double-tap */
         }
-        /* カメラ映像を中央に配置し、反転させる */
+        /* Center and flip the camera feed */
         #webcam {
             transform: scaleX(-1);
         }
-        /* キャンバスを映像の上に重ねる */
+        /* Overlay the canvas on top of the video */
         #canvas-container {
             position: relative;
             width: 640px;
@@ -32,7 +32,7 @@
             left: 0;
             transform: scaleX(-1);
         }
-        /* ローディングスピナー */
+        /* Loading spinner */
         .loader {
             border: 8px solid #f3f3f3;
             border-radius: 50%;
@@ -50,53 +50,53 @@
 <body class="bg-gray-900 text-white flex flex-col items-center justify-center min-h-screen p-4">
 
     <div class="w-full max-w-4xl mx-auto flex flex-col items-center">
-        <h1 class="text-4xl md:text-5xl font-bold mb-2 text-center text-blue-400">AI 腕立て伏せカウンター</h1>
-        <p class="text-gray-400 mb-6 text-center">カメラの前で腕立て伏せの姿勢をとってください。</p>
+        <h1 class="text-4xl md:text-5xl font-bold mb-2 text-center text-blue-400">AI Push-up Counter</h1>
+        <p class="text-gray-400 mb-6 text-center">Get into a push-up position in front of the camera.</p>
 
-        <!-- ローディング表示 -->
+        <!-- Loading Indicator -->
         <div id="loading" class="flex flex-col items-center justify-center h-96">
             <div class="loader mb-4"></div>
-            <p id="loading-message" class="text-lg">AIモデルを読み込んでいます...</p>
+            <p id="loading-message" class="text-lg">Loading AI model...</p>
         </div>
 
-        <!-- メインコンテンツ -->
+        <!-- Main Content -->
         <div id="main-content" class="hidden w-full flex-col lg:flex-row items-center lg:items-start justify-center gap-8">
-            <!-- カメラ映像とキャンバス -->
+            <!-- Camera and Canvas -->
             <div id="canvas-container" class="bg-gray-800 rounded-lg shadow-lg overflow-hidden w-full max-w-[640px] aspect-[4/3]">
                 <video id="webcam" autoplay playsinline class="w-full h-full"></video>
                 <canvas id="canvas" class="w-full h-full"></canvas>
             </div>
 
-            <!-- カウンターと情報表示 -->
+            <!-- Counter and Info Display -->
             <div class="bg-gray-800 p-6 rounded-lg shadow-lg w-full lg:max-w-xs flex flex-col items-center lg:items-start text-center lg:text-left">
-                <h2 class="text-2xl font-bold mb-4 text-blue-400">ステータス</h2>
+                <h2 class="text-2xl font-bold mb-4 text-blue-400">Status</h2>
                 <div class="mb-6 w-full">
-                    <p class="text-lg text-gray-400">回数</p>
+                    <p class="text-lg text-gray-400">Count</p>
                     <p id="count" class="text-7xl font-bold">0</p>
                 </div>
                 <div class="mb-6 w-full">
-                    <p class="text-lg text-gray-400">状態</p>
+                    <p class="text-lg text-gray-400">Stage</p>
                     <p id="stage" class="text-4xl font-semibold uppercase text-yellow-400">-</p>
                 </div>
                  <div class="w-full">
-                    <p class="text-lg text-gray-400">フィードバック</p>
-                    <p id="feedback" class="text-lg font-medium text-green-400 h-12">カメラの準備をしています...</p>
+                    <p class="text-lg text-gray-400">Feedback</p>
+                    <p id="feedback" class="text-lg font-medium text-green-400 h-12">Preparing camera...</p>
                 </div>
                 <button id="reset-button" class="mt-6 w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg transition duration-300">
-                    リセット
+                    Reset
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- TensorFlow.jsとPose Detectionモデルの読み込み -->
+    <!-- TensorFlow.js and Pose Detection model -->
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-core"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-converter"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-webgl"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/pose-detection"></script>
 
     <script>
-        // DOM要素の取得
+        // DOM Elements
         const video = document.getElementById('webcam');
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
@@ -114,7 +114,7 @@
         let counter = 0;
         let stage = 'up'; // 'up' or 'down'
 
-        // 角度を計算する関数
+        // Function to calculate angle
         function calculateAngle(a, b, c) {
             const radians = Math.atan2(c.y - b.y, c.x - b.x) - Math.atan2(a.y - b.y, a.x - b.x);
             let angle = Math.abs(radians * 180.0 / Math.PI);
@@ -124,10 +124,10 @@
             return angle;
         }
         
-        // カメラのセットアップ
+        // Setup camera
         async function setupCamera() {
             if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                throw new Error('お使いのブラウザではカメラ機能がサポートされていません。');
+                throw new Error('Camera not supported by this browser.');
             }
             const stream = await navigator.mediaDevices.getUserMedia({
                 'video': {
@@ -144,7 +144,7 @@
             });
         }
 
-        // ポーズ検出モデルのロード
+        // Load the pose detection model
         async function loadModel() {
             const model = poseDetection.SupportedModels.MoveNet;
             const detectorConfig = {
@@ -153,7 +153,7 @@
             detector = await poseDetection.createDetector(model, detectorConfig);
         }
         
-        // ポーズ検出のメインループ
+        // Main pose detection loop
         async function detectPose() {
             if (detector) {
                 try {
@@ -161,11 +161,13 @@
                 } catch (error) {
                     detector.dispose();
                     detector = null;
-                    alert("エラーが発生しました: " + error.message);
+                    // Changed from alert to a less intrusive feedback method
+                    feedbackEl.textContent = "An error occurred: " + error.message;
+                    feedbackEl.className = "text-lg font-medium text-red-500 h-12";
                     return;
                 }
 
-                // 描画処理
+                // Drawing functions
                 drawCanvas();
 
                 if (poses && poses.length > 0) {
@@ -177,14 +179,14 @@
             requestAnimationFrame(detectPose);
         }
 
-        // キャンバスのクリアと映像の描画
+        // Clear and prepare the canvas
         function drawCanvas() {
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
             // ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
         }
 
-        // キーポイントの描画
+        // Draw keypoints
         function drawKeypoints(pose) {
             for (const keypoint of pose.keypoints) {
                 if (keypoint.score > 0.5) {
@@ -196,7 +198,7 @@
             }
         }
 
-        // スケルトンの描画
+        // Draw the skeleton
         function drawSkeleton(pose) {
             const adjacentKeyPoints = poseDetection.util.getAdjacentPairs(poseDetection.SupportedModels.MoveNet);
             ctx.lineWidth = 2;
@@ -215,11 +217,11 @@
             });
         }
         
-        // 腕立て伏せのロジック処理
+        // Process push-up logic
         function processPushup(pose) {
             const keypoints = pose.keypoints;
 
-            // 必要なキーポイントを取得
+            // Get required keypoints
             const leftShoulder = keypoints.find(k => k.name === 'left_shoulder');
             const leftElbow = keypoints.find(k => k.name === 'left_elbow');
             const leftWrist = keypoints.find(k => k.name === 'left_wrist');
@@ -227,14 +229,14 @@
             const rightElbow = keypoints.find(k => k.name === 'right_elbow');
             const rightWrist = keypoints.find(k => k.name === 'right_wrist');
 
-            // 体が横向きかチェック（両肩が見えているか）
+            // Check if the body is sideways (if both shoulders are visible)
             if (leftShoulder.score > 0.5 && rightShoulder.score > 0.5) {
-                feedbackEl.textContent = '体をカメラに対して横向きにしてください。';
+                feedbackEl.textContent = 'Please turn your body sideways to the camera.';
                 feedbackEl.className = "text-lg font-medium text-yellow-400 h-12";
                 return;
             }
 
-            // 片方の腕の角度を計算（より信頼度の高い方を使用）
+            // Calculate angle of one arm (use the one with higher confidence)
             let shoulder, elbow, wrist;
             if (leftShoulder.score > rightShoulder.score) {
                 shoulder = leftShoulder;
@@ -249,55 +251,55 @@
             if (shoulder.score > 0.5 && elbow.score > 0.5 && wrist.score > 0.5) {
                 const angle = calculateAngle(shoulder, elbow, wrist);
 
-                // 腕立て伏せの判定
-                if (angle > 160) { // 腕が伸びている状態
+                // Push-up detection logic
+                if (angle > 160) { // Arm is straight
                     if (stage === 'down') {
                         counter++;
-                        feedbackEl.textContent = 'ナイス！';
+                        feedbackEl.textContent = 'Nice!';
                         feedbackEl.className = "text-lg font-medium text-green-400 h-12";
                     }
                     stage = 'up';
-                } else if (angle < 90) { // 腕が曲がっている状態
+                } else if (angle < 90) { // Arm is bent
                     if(stage === 'up') {
-                         feedbackEl.textContent = 'もっと下げて！';
+                         feedbackEl.textContent = 'Go lower!';
                          feedbackEl.className = "text-lg font-medium text-blue-400 h-12";
                     }
                     stage = 'down';
                 }
                 
-                // UIの更新
+                // Update UI
                 countEl.textContent = counter;
                 stageEl.textContent = stage;
             } else {
-                 feedbackEl.textContent = '肩、肘、手首が映るようにしてください。';
+                 feedbackEl.textContent = 'Make sure your shoulder, elbow, and wrist are visible.';
                  feedbackEl.className = "text-lg font-medium text-yellow-400 h-12";
             }
         }
         
-        // リセットボタンの処理
+        // Reset button handler
         resetButton.addEventListener('click', () => {
             counter = 0;
             stage = 'up';
             countEl.textContent = counter;
             stageEl.textContent = '-';
-            feedbackEl.textContent = 'カウンターをリセットしました。';
+            feedbackEl.textContent = 'Counter has been reset.';
         });
 
-        // レスポンシブ対応
+        // Responsive canvas
         function resizeCanvas() {
             const containerWidth = canvasContainer.clientWidth;
             const aspectRatio = 4 / 3;
             canvasContainer.style.height = `${containerWidth / aspectRatio}px`;
         }
 
-        // 初期化処理
+        // Initialization function
         async function main() {
             try {
                 await loadModel();
-                loadingMessageEl.textContent = 'カメラのアクセスを許可してください...';
+                loadingMessageEl.textContent = 'Please allow camera access...';
                 await setupCamera();
             } catch (e) {
-                loadingMessageEl.textContent = `エラー: ${e.message}`;
+                loadingMessageEl.textContent = `Error: ${e.message}`;
                 loadingMessageEl.style.color = 'red';
                 return;
             }
@@ -305,7 +307,7 @@
             loadingEl.classList.add('hidden');
             mainContentEl.classList.remove('hidden');
             mainContentEl.classList.add('flex');
-            feedbackEl.textContent = '準備完了です！';
+            feedbackEl.textContent = 'Ready!';
             
             resizeCanvas();
             window.addEventListener('resize', resizeCanvas);
@@ -317,3 +319,4 @@
     </script>
 </body>
 </html>
+
