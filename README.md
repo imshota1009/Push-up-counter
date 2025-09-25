@@ -3,7 +3,6 @@
 A web application that uses your webcam and AI-based pose estimation to automatically count push-ups in real time.  
 Track your workouts accurately at home — no gym required!  
 
-👉 Start here: https://imshota1009.github.io/Push-up-counter/
 
 <div align="center">
   <img src="images/push_up_screenshot.png" alt="Push-up Counter Screenshot">
